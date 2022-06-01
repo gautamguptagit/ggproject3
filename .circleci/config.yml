@@ -44,7 +44,7 @@ jobs:
           name: Build front-end
           command: |
             # Your code here
-            cd frontend
+            cd frontend  
             npm install
             npm run build
             exit 0
