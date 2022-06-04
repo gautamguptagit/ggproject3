@@ -184,7 +184,7 @@ jobs:
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text)
             echo "Backend URL": $BackendURL
-            curl -H "Content-Type: text/plain" -H "token: udapeople-cicd-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "$BackendURL" https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7}
+            curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "$BackendURL" https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: Install tar/gzip utility
           command: |
