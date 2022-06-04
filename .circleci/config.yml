@@ -152,7 +152,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Ensure back-end infrastructure exists
+          name: yum -y install tar gzip project3
+          command: |
+            yum -y install tar gzip
+      - run:
+          name: Ensure that the back-end infrastructure exists
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
@@ -185,10 +189,10 @@ jobs:
      #       --output text)
      #       echo "Backend URL": $BackendURL
      #       curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "$BackendURL" https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7}
-      - run:
-          name: Install tar/gzip utility
-          command: |
-            yum -y install tar gzip
+      # - run:
+      #     name: Install tar/gzip utility
+      #     command: |
+      #       yum -y install tar gzip
       - persist_to_workspace:
           root: .circleci/ansible
           paths:
