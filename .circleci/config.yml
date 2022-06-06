@@ -178,17 +178,18 @@ jobs:
             aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --output text >> inventory.txt
+            --output text >> `/inventory.txt
             cat inventory.txt
-      # - run:
-      #     name: Save back-end url link
-      #     command: |
-      #       BackendURL=$(aws ec2 describe-instances \  
-      #       --query "Reservations[*].Instances[*].[PublicIpAddress]" \
-      #       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #       --output text)
-      #       echo "Backend URL": $BackendURL
-      #       curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "$BackendURL" https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7}
+     - run:
+          name: Save back-end url link
+          command: |
+            cd .circleci/ansible
+            BackendURL=$(aws ec2 describe-instances \  
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            echo "Backend URL": $BackendURL
+            curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "http://$Backend_URL:3030" https://api.memstash.io/values/BackendURL
       # # - run:
       #     name: Install tar/gzip utility
       #     command: |
