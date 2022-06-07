@@ -26,7 +26,10 @@ commands:
         type: string
     steps:
       - run:
-          name: Revert migrations
+          name: Revert Migration
+    # steps:
+    #   - run:
+    #       name: Revert migrations
           when: on_fail
           command: |
           #   # Delete the S3 buckets. 
