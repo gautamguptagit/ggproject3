@@ -46,7 +46,7 @@ commands:
 #               npm install
 #               # Add revert code here. You can find this in the Getting Started section.<done>
 #               npm run migrations:revert
-#             fi
+#             ficc
 
 jobs:
   build-frontend:
