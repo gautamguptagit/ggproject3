@@ -28,13 +28,10 @@ commands:
           default: ${CIRCLE_WORKFLOW_ID:0:7}   
     steps:
       - run:
-          name: Revert migrations
-          # Add when this will run
+          name: Revert Migrations
           when: on_fail
           command: |
             SUCCESS=$(curl --insecure https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
-#            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
             if(( $SUCCESS==1 )); 
             then
                cd ~/project/backend
@@ -304,7 +301,7 @@ jobs:
            cd backend
            if grep -q "has been executed successfully" migrations_file.txt
            then 
-            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -D '1'
+            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
