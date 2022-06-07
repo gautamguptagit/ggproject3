@@ -227,13 +227,15 @@ jobs:
             ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+
   run-migrations:
     docker:
       - image: cimg/node:18.2.0
-      # Docker image here that supports NodeJS
+      
     steps:
-        - checkout
-      # Checkout code from git
+      - checkout
+     
       - run:
           name: Run migrations
           command: |
@@ -276,7 +278,7 @@ jobs:
   #          command: |
   #           cd backend
   #           if grep -q "has been executed successfully." migrations_file.txt
-  #           then
+  #            then
   #            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
   #            fi
     # - destroy-environment:
