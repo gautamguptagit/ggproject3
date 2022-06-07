@@ -18,6 +18,31 @@ commands:
             # Delete the stacks
             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
+
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    parameters:
+      # Add parameter here
+      workflow_id:
+          type: string
+          default: ${CIRCLE_WORKFLOW_ID:0:7}   
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
+#            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS = 1
+            if(( $SUCCESS==1 )); 
+            then
+               cd ~/project/backend
+               npm install
+         #      Add revert code here. You can find this in the Getting Started section.
+               npm run migration:revert
+  
+            fi
             
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
@@ -258,6 +283,35 @@ jobs:
             ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+      # Docker image here that supports NodeJS
+    steps:
+        - checkout
+      # Checkout code from git
+      - run:
+          name: Run migrations
+          command: |
+           cd backend
+           sudo apt-get update
+           sudo apt-get install awscli
+           npm install
+           npm run migrations >> migrations_file.txt
+      - run:
+          name: Send migration results to kvdb gg bucket
+          command: |
+           cd backend
+           if grep -q "has been executed successfully" migrations_file.txt
+           then 
+            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -D '1'
+            fi
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+     # Here's where you will add some code to rollback on failure   
   
   # run-migrations:
   #   docker:
@@ -274,18 +328,17 @@ jobs:
   #           npm run migrations >> migrations_file.txt
   #   - run:
   #          name: send migration results to kvdb gg
-
-  #         #name: Send migration results to kvdb
+  #         
   #          command: |
   #           cd backend
   #           if grep -q "has been executed successfully." migrations_file.txt
   #           then
   #            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
   #            fi
-  #   - destroy-environment:
-  #          workflow_id: ${CIRCLE_WORKFLOW_ID}
-  #     # - revert-migrations:
-  #     #     workflow_id: ${CIRCLE_WORKFLOW_ID}
+    # - destroy-environment:
+    #        workflow_id: ${CIRCLE_WORKFLOW_ID}
+    #   # - revert-migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID}
 
 workflows:
   default:
@@ -304,5 +357,6 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
+      
