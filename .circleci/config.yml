@@ -22,40 +22,57 @@ commands:
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
+      # Add parameter here 
       workflow_id:
-        type: string
+          type: string
+          default: ${CIRCLE_WORKFLOW_ID:0:7}    
     steps:
       - run:
-          name: Revert Migration
-    # steps:
-    #   - run:
-    #       name: Revert migrations
+          name: Revert migrations
+          # Add when this will run
           when: on_fail
           command: |
-          #   # Delete the S3 buckets. 
-          # name: Revert migrations
-          # # Add when this will run 
-          # when: on_fail
-          #    command: |
-
-          #   #command: |
-               SUCCESS=$(curl --insecure  https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
-               if (( $SUCCESS == 1 ));
-               then
-                 cd ~/project/backend
-                 npm install
-                 npm run migration:revert
-               fi
+            SUCCESS=$(curl --insecure https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
+            if (( $SUCCESS == 1 ));
+            then
+                cd ~/project/backend
+                npm install
+                npm run migration:revert
+            fi          
+#   revert-migrations:
+#     description: Revert the last migration if successfully run in the current workflow.
+#     parameters:
+#       workflow_id:
+#         type: string
+#     steps:
+#       - run:
+#           name: Revert Migration
+#           when: on_fail
 #           command: |
-#             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#             SUCCESS=$(curl -H "token: udapeople-cicd-migration-<<parameters.workflow_id>>" --request GET https://api.memstash.io/values/migration_<<parameters.workflow_id>>)
-#             if(( $SUCCESS==1 )); 
-#             then
-#               cd ~/project/backend
-#               npm install
-#               # Add revert code here. You can find this in the Getting Started section.<done>
-#               npm run migrations:revert
-#             ficc
+#        #   #   # Delete the S3 buckets. 
+#           # name: Revert migrations
+#           # # Add when this will run 
+#           # when: on_fail
+#           #    command: |
+
+#           #   #command: |
+#                SUCCESS=$(curl --insecure  https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
+#                if (( $SUCCESS == 1 ));
+#                then
+#                  cd ~/project/backend
+#                  npm install
+#                  npm run migration:revert
+#                fi
+# #           command: |
+# #             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+# #             SUCCESS=$(curl -H "token: udapeople-cicd-migration-<<parameters.workflow_id>>" --request GET https://api.memstash.io/values/migration_<<parameters.workflow_id>>)
+# #             if(( $SUCCESS==1 )); 
+# #             then
+# #               cd ~/project/backend
+# #               npm install
+# #               # Add revert code here. You can find this in the Getting Started section.<done>
+# #               npm run migrations:revert
+# #             ficc
 
 jobs:
   build-frontend:
