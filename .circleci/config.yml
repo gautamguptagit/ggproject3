@@ -272,7 +272,7 @@ jobs:
             sudo apt-get install awscli
             npm install
             npm run migrations >> migrations_file.txt
-      - run:
+       - run:
         name: send migration results to kvdb gg
 
           #name: Send migration results to kvdb
