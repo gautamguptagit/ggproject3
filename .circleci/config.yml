@@ -260,13 +260,13 @@ jobs:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   
   run-migrations:
-  docker:
+    docker:
       - image: circleci/node:13.8.0
     steps:
         - checkout
-     - run:
-          name: Run migrations
-          command: |
+    - run:
+           name: Run migrations
+           command: |
             cd backend
             sudo apt-get update
             sudo apt-get install awscli
@@ -281,12 +281,9 @@ jobs:
             if grep -q "has been executed successfully." migrations_file.txt
             then
              curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-          #    curl -H "Content-Type: text/plain" -H "token: udapeople-cicd-migration-${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-          # else
-          #    echo $(curl -H "Content-Type: text/plain" -H "token: udapeople-cicd-migration-${CIRCLE_WORKFLOW_ID}" --request PUT --data "0" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID})
              fi
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID}
+    - destroy-environment:
+           workflow_id: ${CIRCLE_WORKFLOW_ID}
       # - revert-migrations:
       #     workflow_id: ${CIRCLE_WORKFLOW_ID}
 
