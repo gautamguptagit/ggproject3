@@ -189,7 +189,9 @@ jobs:
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text)
             echo "Backend URL": $BackendURL
-            curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "http://$Backend_URL:3030" https://api.memstash.io/values/BackendURL
+            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/backend_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+      #     curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "http://$Backend_URL:3030" https://api.memstash.io/values/BackendURL
+      # BpDcbSg4F8M7GxaE6ytSdz is my bucket created at kvdb
       # # - run:
       #     name: Install tar/gzip utility
       #     command: |
