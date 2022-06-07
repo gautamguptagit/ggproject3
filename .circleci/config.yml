@@ -23,20 +23,20 @@ commands:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       workflow_id:
-        type: string
+          type: string
     steps:
       - run:
           name: Revert migrations
           # Add when this will run 
           when: on_fail
             command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
-            if (( $SUCCESS == 1 ));
-            then
-                cd ~/project/backend
-                npm install
-                npm run migration:revert
-            fi
+               SUCCESS=$(curl --insecure  https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
+               if (( $SUCCESS == 1 ));
+               then
+                 cd ~/project/backend
+                 npm install
+                 npm run migration:revert
+               fi
 #           command: |
 #             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
 #             SUCCESS=$(curl -H "token: udapeople-cicd-migration-<<parameters.workflow_id>>" --request GET https://api.memstash.io/values/migration_<<parameters.workflow_id>>)
