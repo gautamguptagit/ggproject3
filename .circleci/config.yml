@@ -7,6 +7,7 @@ commands:
       # Add parameter here
       workflow_id:
         type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Destroy environments
@@ -28,7 +29,7 @@ commands:
           default: ${CIRCLE_WORKFLOW_ID:0:7}   
     steps:
       - run:
-          name: Revert Migrations
+          name: Revert migrations
           when: on_fail
           command: |
             SUCCESS=$(curl --insecure https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
@@ -282,7 +283,7 @@ jobs:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:18.2.0
       # Docker image here that supports NodeJS
     steps:
         - checkout
@@ -301,8 +302,8 @@ jobs:
            cd backend
            if grep -q "has been executed successfully" migrations_file.txt
            then 
-            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-            fi
+           curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+           fi
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
