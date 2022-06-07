@@ -27,11 +27,15 @@ commands:
     steps:
       - run:
           name: Revert migrations
-          # Add when this will run 
           when: on_fail
-             command: |
-             
-            #command: |
+          command: |
+          #   # Delete the S3 buckets. 
+          # name: Revert migrations
+          # # Add when this will run 
+          # when: on_fail
+          #    command: |
+
+          #   #command: |
                SUCCESS=$(curl --insecure  https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_<< parameters.workflow_id >>)
                if (( $SUCCESS == 1 ));
                then
