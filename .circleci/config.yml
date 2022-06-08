@@ -251,6 +251,7 @@ jobs:
            if grep -q "has been executed successfully" migrations_file.txt
            then 
            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+           curl -d 'Gautam Success Mig' https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migrationGG
            fi
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
