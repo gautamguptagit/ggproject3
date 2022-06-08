@@ -346,7 +346,8 @@ jobs:
             # cat /tmp/.circleci/ansible/inventory.txt
                         
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i  /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+            # ansible-playbook -i  /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
+            ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
