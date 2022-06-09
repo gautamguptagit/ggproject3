@@ -381,7 +381,7 @@ jobs:
             if curl -s ${URL} | grep "Welcome Gautam Gupta"
             then
               echo "Successful front-end Smoke-test but failing intentionally"
-              exit 1
+              # exit 1
             else
               echo "Unsuccessful front-end Smoke-test"
               exit 1
