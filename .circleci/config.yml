@@ -365,12 +365,12 @@ jobs:
             sudo apt update
             sudo apt install -y awscli
             sudo apt install -y python3 ansible
-      - run:
-          name: Get backend url
-          command: |          
-              curl -H "token: udapeople-cicd-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" \
-                --request GET https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7} \
-                > .circleci/Backend_URL.txt
+      # - run:
+      #     name: Get backend url
+      #     command: |          
+      #         curl -H "token: udapeople-cicd-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #           --request GET https://api.memstash.io/values/BackendURL_${CIRCLE_WORKFLOW_ID:0:7} \
+      #           > .circleci/Backend_URL.txt
       - run:
           name: Backend smoke test.
           command: |
