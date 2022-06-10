@@ -365,6 +365,9 @@ jobs:
             sudo apt update
             sudo apt install -y awscli
             sudo apt install -y python3 ansible
+            sudo apt install -y curl
+            sudo apt upgrade -y
+            aws --version
       # - run:
       #     name: Get backend url
       #     command: |          
@@ -381,7 +384,7 @@ jobs:
             if curl -s ${URL} | grep "Welcome"
             then
               echo "Successful front-end Smoke-test but failing intentionally"
-              exit 1
+              # exit 1
 
             else
               echo "Unsuccessful front-end Smoke-test"
