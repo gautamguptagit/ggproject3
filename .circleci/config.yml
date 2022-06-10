@@ -368,10 +368,10 @@ jobs:
             sudo apt install -y curl
             sudo apt upgrade -y
             aws --version
-            apk add curl
-            apk add nodejs npm
-            /usr/local/bin/python -m pip install --upgrade pip
-            pip install awscli --upgrade
+            # apk add curl
+            # apk add nodejs npm
+            # /usr/local/bin/python -m pip install --upgrade pip
+            # pip install awscli --upgrade
       # - run:
       #     name: Get backend url
       #     command: |          
@@ -425,7 +425,7 @@ jobs:
 
 
 
-     # Here's where you will add some codee to rollback on failure   
+     # Here's where you will addd some codee to rollback on failure   
   
   # run-migrations:
   #   docker:
