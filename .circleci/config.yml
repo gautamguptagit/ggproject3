@@ -393,6 +393,7 @@ jobs:
       - run:
           name: Backend smoke test.
           command: |
+            npm run start
             # url=$(cat .circleci/Backend_URL.txt)
             # url="http://${url}:3030/api/status"
             # echo $url
