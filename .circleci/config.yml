@@ -395,34 +395,80 @@ jobs:
               echo "Unsuccessful front-end Smoke-test"
               exit 1
             fi
+  
+  cloudfront-update:
+    docker:
+        - image: amazon/aws-cli
+    steps:
+      - checkout
       - run:
-          name: Backend smoke test.
+          name: Install dependencies
           command: |
-            # npm run start
-            # url=$(cat .circleci/Backend_URL.txt)
-            # url="http://${url}:3030/api/status"
-            # echo $url
-            # curl $url
-            export BACKEND_IP=$(aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                --output text)
-              export API_URL="http://${BACKEND_IP}:3030"
-              echo "API_URL = ${API_URL}"
-              sleep 60
-              if curl "${API_URL}/api/status" | grep "ok"
-              then
-                echo SUCCESS
-                exit 0
-              else
-                echo FAIL
-                exit 1
-              fi
+            yum install -y curl
+            yum -y install tar gzip
+            
+      - run:
+          name: Get old stack workflow id
+          command: |
+            # your code here
+            OldWorkflowID=$(aws cloudformation \
+                          list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                          --no-paginate --output text | tr -d '\n')
+            echo $OldWorkflowID
+            cat ~/OldWorkflowID.txt
+            # aws cloudformation deploy \
+            # --template-file .circleci/files/cloudfront.yml \
+            # --stack-name InitialStack \
+            # --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+            # --tags project=udapeople
+            # echo OldWorkflowID: "${OldWorkflowID}"
+            # echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"          
+            #    
+            # curl -H "Content-Type: text/plain" -H "token: udapeople-cicd-OldWorkflowID-${CIRCLE_WORKFLOW_ID:0:7}" \
+            #             --request PUT --data "${OldWorkflowID}" \
+            #             https://api.memstash.io/values/OldWorkflowID_${CIRCLE_WORKFLOW_ID}            
+      - run:
+          name: Update cloudfront distribution
+          command: |
+              aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name udapeople-cloudfront \
+              --tags project=udapeople-cicd \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"  
+              echo OldWorkflowID: "${OldWorkflowID}"
+              echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"      
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - OldWorkflowID.txt
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}  
+      # - run:
+      #     name: Backend smoke test.
+      #     command: |
+            
+      #       export BACKEND_IP=$(aws ec2 describe-instances \
+      #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
+      #           --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #           --output text)
+      #         export API_URL="http://${BACKEND_IP}:3030"
+      #         echo "API_URL = ${API_URL}"
+      #         sleep 60
+      #         if curl "${API_URL}/api/status" | grep "ok"
+      #         then
+      #           echo SUCCESS
+      #           exit 0
+      #         else
+      #           echo FAIL
+      #           exit 1
+      #         fi
       
       # - destroy-environment:
       #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert-migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
 
@@ -480,8 +526,8 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - cloudfront-update:
+          requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
       
