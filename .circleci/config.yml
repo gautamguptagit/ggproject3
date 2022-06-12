@@ -358,17 +358,36 @@ jobs:
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
             cat backend/.env
-            
-            tar -C backend -czvf backend.tar.gz .
-            echo "gautam gupta ansible"
+       run:
+          name: Deploy backend
+          command: |
+            # your code here
+            cd backend
+            npm i
+            npm run build
+            # cp package* ./dist
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            pwd
+            ls
+            echo "mv artifac to ansibble -------"
+            mv artifact.tar.gz .circleci/ansible/
             cd .circleci/ansible
-            echo "contents of my inventory text files --"
+            echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
-            # cat /tmp/.circleci/ansible/inventory.txt
-                        
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            # ansible-playbook -i  /tmp/.circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml
             ansible-playbook -i inventory.txt deploy-backend.yml
+
+            # tar -C backend -czvf backend.tar.gz .
+            # echo "gautam gupta ansible"
+            # cd .circleci/ansible
+            # echo "contents of my inventory text files --"
+            # cat inventory.txt
+            
+                        
+            # export ANSIBLE_HOST_KEY_CHECKING=False
+            
+            # ansible-playbook -i inventory.txt deploy-backend.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
