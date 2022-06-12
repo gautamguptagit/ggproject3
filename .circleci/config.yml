@@ -218,7 +218,8 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["c1:84:ec:3f:11:24:da:80:8d:61:1c:c6:c7:ae:ee:f6"]      # Added ssh keys with fingerprint
       - attach_workspace:
-          at: /tmp/.circleci/ansible
+          # at: /tmp/.circleci/ansible
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -227,8 +228,13 @@ jobs:
       - run:
           name: Configure server
           command: |
-            cat /tmp/.circleci/ansible/inventory.txt
-            ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            pwd
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
+            # cat /tmp/.circleci/ansible/inventory.txt
+            # ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
