@@ -1,8 +1,8 @@
 ---
   - name: "configuration play." 
-  hosts: web
-  user: ubuntu
-  gather_facts: false
+    hosts: web
+    user: ubuntu
+    gather_facts: false
   # timeout: 600
   vars:
     - ansible_python_interpreter: /usr/bin/python3
