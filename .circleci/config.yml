@@ -488,7 +488,7 @@ jobs:
   #           tar -C backend -czvf artifact.tar.gz .
   #           pwd
   #           ls
-  #           echo "mv artifac to ansibble -------"
+  #           echo "mv artifac tto ansibble -------"
   #           mv artifact.tar.gz .circleci/ansible/
   #           cd .circleci/ansible
   #           echo "Contents  of the inventory.txt file is -------"
