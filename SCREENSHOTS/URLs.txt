@@ -1,11 +1,13 @@
-1) Public URL for my GitHub repository  [URL01]
+List of URLs
+
+1) GitHub repository  [URL01]
 https://github.com/gautamguptagit/ggproject3
 
-2) Public URL for your S3 Bucket  [URL02]
+2) URL for my S3 Bucket  [URL02]
 http://udapeople-13064a5.s3-website-us-east-1.amazonaws.com
 
-3) Public URL for your CloudFront distribution (aka, your blue production front-end) [URL03]
-https://d1q2c2ci4hb0sw.cloudfront.net
+3 . URL for my CloudFront distribution [URL03]
+http://d1q2c2ci4hb0sw.cloudfront.net/#/employees
 
 4)Public URLs to deployed application back-end in EC2 [URL04]
 http://ec2-18-208-183-99.compute-1.amazonaws.com:3030/api/status
