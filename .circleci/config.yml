@@ -2,9 +2,9 @@ version: 2.1
 
 commands:          
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+    description: For a workflowid to delete backend & frontend cloudformation stacks.
     parameters:
-      # Add parameter here
+      # Adding the parms 
       workflow_id:
         type: string
         default: ${CIRCLE_WORKFLOW_ID:0:7}
@@ -13,15 +13,15 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            # Delete the S3 buckets. 
+            # Deleting the S3 bucket here
             aws s3 rb s3://udapeople-<<parameters.workflow_id>> --force                 
             
-            # Delete the stacks
+            # Deleting both the fe and be cf stacks here
             aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
             aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
 
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
+    description: To revert the last migration if ran successfully in the current work-flow.
     parameters:
      
       workflow_id:
@@ -183,30 +183,12 @@ jobs:
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text >> inventory.txt
             cat inventory.txt
-      # - run:
-      #     name: Save back-end url link
-      #     command: |
-      #       cd .circleci/ansible
-      #       BackendURL=$(aws ec2 describe-instances \  
-      #         --query 'Reservations[*].Instances[*].PublicIpAddress' \
-      #         --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #         --output text)
-      #       echo "Backend URL": $BackendURL
-      #       curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/backend_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-      #     curl -H "Content-Type: text/plain" -H "token: udapeople-BackendURL-${CIRCLE_WORKFLOW_ID:0:7}" --request PUT --data "http://$Backend_URL:3030" https://api.memstash.io/values/BackendURL
-      # BpDcbSg4F8M7GxaE6ytSdz is my bucket created at kvdb
-      # # - run:
-      #     name: Install tar/gzip utility
-      #     command: |
-      #       yum -y install tar gzip
+      
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      # - persist_to_workspace:
-      #     root: .circleci/ansible
-      #     paths:
-      #       - inventory.txt
+      
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}   
 
@@ -216,9 +198,9 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["c1:84:ec:3f:11:24:da:80:8d:61:1c:c6:c7:ae:ee:f6"]      # Added ssh keys with fingerprint
+          fingerprints: ["c1:84:ec:3f:11:24:da:80:8d:61:1c:c6:c7:ae:ee:f6"]      # ssh keys with fingerprint
       - attach_workspace:
-          # at: /tmp/.circleci/ansible
+          
           at: ~/
       - run:
           name: Install dependencies
@@ -233,15 +215,13 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-            # cat /tmp/.circleci/ansible/inventory.txt
-            # ansible-playbook -i /tmp/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
   run-migrations:
-    # docker:
-    #   - image: cimg/node:18.2.0
+    
     docker:
       - image: cimg/node:16.13.1
     resource_class: medium
@@ -255,15 +235,6 @@ jobs:
           command: |
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
     
-     
-      # - run:
-      #     name: Run migrations
-      #     command: |
-      #      cd backend
-      #      sudo apt-get update
-      #      sudo apt-get install awscli
-      #      npm install
-      #      npm run migrations >> migrations_file.txt
       - run:
           name: Run migrations
           command: |
@@ -283,7 +254,7 @@ jobs:
             npm install
             npm run migrations > migrations_dump.txt
       - run:
-          # It seems like memstash.io is no longer available/accessible (?)
+
           name: Report migration results
           command: |
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
@@ -299,15 +270,7 @@ jobs:
           root: ~/
           paths:
             - project/backend/migration-results.txt
-      # - run:
-      #     name: Send migration results to kvdb gg bucket
-      #     command: |
-      #      cd backend
-      #      if grep -q "has been executed successfully" migrations_dump.txt
-      #      then 
-      #      curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-      #      curl -d 'Gautam Success Mig' https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migrationGG
-      #      fi
+      
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
@@ -360,12 +323,10 @@ jobs:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   deploy-backend:
     docker:
-      # Docker image here that supports Ansible
+      
       - image: python:3.7-alpine3.11
     steps:
-      # Checkout code from git
-      # Add ssh keys with fingerprint
-      # attach workspace
+      
       - checkout
       - add_ssh_keys:
             fingerprints: ["c1:84:ec:3f:11:24:da:80:8d:61:1c:c6:c7:ae:ee:f6"]
@@ -430,85 +391,14 @@ jobs:
             echo "Contents  of the inventory.txt file is -------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      #Here's where you will add some code to rollback on failure
+      
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert-migrations:
           workflow_id: "${CIRCLE_WORKFLOW_ID:0:7}"
 
 
-  # deploy-backend:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["c1:84:ec:3f:11:24:da:80:8d:61:1c:c6:c7:ae:ee:f6"]      # Add ssh keys with fingerprint
-  #     - restore_cache:
-  #         keys: [backend-build]
-  #     - attach_workspace:
-  #         at: /tmp/.circleci/ansible
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           sudo apt-get update
-  #           sudo apt-get install python3
-  #           sudo apt-get install ansible
-  #           sudo apt-get install awscli       
-  #     - run:
-  #         name: Deploy backend
-  #         command: |
-  #           cd backend
-  #           npm i
-  #           npm run build
-  #           cd ..
-  #           echo ENVIRONMENT=production >> "backend/.env"
-  #           echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-  #           echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-  #           echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-  #           echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-  #           echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-  #           echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-  #           echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-  #           echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-  #           echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-  #           cat backend/.env
-      
-
-  #     - run:
-  #         name: Deploy backendd
-  #         command: |
-  #           # your code here
-  #           cd backend
-  #           npm i
-  #           npm run build
-  #           # cp package* ./dist
-  #           cd ..
-  #           # Zip the directory
-  #           tar -C backend -czvf artifact.tar.gz .
-  #           pwd
-  #           ls
-  #           echo "mv artifac tto ansibble -------"
-  #           mv artifact.tar.gz .circleci/ansible/
-  #           cd .circleci/ansible
-  #           echo "Contents  of the inventory.txt file is --------"
-  #           cat inventory.txt
-  #           ansible-playbook -i inventory.txt deploy-backend.yml
-
-  #           # tar -C backend -czvf backend.tar.gz .
-  #           # echo "gautam gupta ansible"
-  #           # cd .circleci/ansible
-  #           # echo "contents of my inventory text files --"
-  #           # cat inventory.txt
-            
-                        
-  #           # export ANSIBLE_HOST_KEY_CHECKING=False
-            
-  #           # ansible-playbook -i inventory.txt deploy-backend.yml
-  #     - destroy-environment:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-  #     - revert-migrations:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  
   
   smoke-test:
     docker:
@@ -590,17 +480,7 @@ jobs:
                           --no-paginate --output text | tr -d '\n')
             echo $OldWorkflowID >> ~/OldWorkflowID.txt
             cat ~/OldWorkflowID.txt
-            # aws cloudformation deploy \
-            # --template-file .circleci/files/cloudfront.yml \
-            # --stack-name InitialStack \
-            # --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-            # --tags project=udapeople
-            # echo OldWorkflowID: "${OldWorkflowID}"
-            # echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"          
-            #    
-            # curl -H "Content-Type: text/plain" -H "token: udapeople-cicd-OldWorkflowID-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #             --request PUT --data "${OldWorkflowID}" \
-            #             https://api.memstash.io/values/OldWorkflowID_${CIRCLE_WORKFLOW_ID}            
+                     
       - run:
           name: Update cloudfront distribution
           command: |
@@ -634,7 +514,7 @@ jobs:
       - run:
           name: Get old stack workflow id
           command: |
-            # get oldworkflow
+            
             cat ~/OldWorkflowID.txt
             OldWorkflowID=$(cat ~/OldWorkflowID.txt)
             echo OldWorkflowID: "${OldWorkflowID}"
@@ -643,7 +523,7 @@ jobs:
                     --no-paginate --output text)
             echo OldWorkflowID: "${OldWorkflowID}"
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
-            # Fetch the stack names
+            
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                     --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
             echo Stack names: "${STACKS[@]}"
@@ -661,37 +541,6 @@ jobs:
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID:10:7}"
             fi
       
-
-
-
-     # Here's where you will addd some codee to rollback on failure   
-  
-  # run-migrations:
-  #   docker:
-  #     - image: circleci/node:13.8.0
-  #   steps:
-  #       - checkout
-  #   - run:
-  #          name: Run migrations
-  #          command: |
-  #           cd backend
-  #           sudo apt-get update
-  #           sudo apt-get install awscli
-  #           npm install
-  #           npm run migrations >> migrations_file.txt
-  #   - run:
-  #          name: send migration results to kvdb gg
-  #         
-  #          command: |
-  #           cd backend
-  #           if grep -q "has been executed successfully." migrations_file.txt
-  #            then
-  #            curl https://kvdb.io/BpDcbSg4F8M7GxaE6ytSdz/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-  #            fi
-    # - destroy-environment:
-    #        workflow_id: ${CIRCLE_WORKFLOW_ID}
-    #   # - revert-migrations:
-      #     workflow_id: ${CIRCLE_WORKFLOW_ID}
 
 workflows:
   default:
